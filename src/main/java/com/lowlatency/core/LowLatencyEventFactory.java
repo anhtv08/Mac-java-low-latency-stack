@@ -5,7 +5,7 @@ import com.lmax.disruptor.EventFactory;
 /**
  * Factory for creating Event instances in the Disruptor ring buffer
  */
-public class EventFactory implements EventFactory<Event> {
+public class LowLatencyEventFactory implements EventFactory<Event> {
     
     @Override
     public Event newInstance() {

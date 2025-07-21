@@ -1,9 +1,16 @@
 package com.lowlatency.core;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Reusable event object for Disruptor ring buffer
  * Designed to minimize GC pressure through object reuse
  */
+@Data
+@NoArgsConstructor
+@Slf4j
 public class Event {
     private long id;
     private String symbol;
@@ -16,10 +23,8 @@ public class Event {
         TRADE, QUOTE, ORDER
     }
     
-    // Default constructor required by Disruptor
-    public Event() {}
-    
     public void reset() {
+        log.trace("Resetting event with id: {}", this.id);
         this.id = 0;
         this.symbol = null;
         this.price = 0.0;
@@ -29,6 +34,7 @@ public class Event {
     }
     
     public void copyFrom(Event other) {
+        log.trace("Copying event from id: {} to id: {}", other.id, this.id);
         this.id = other.id;
         this.symbol = other.symbol;
         this.price = other.price;
@@ -36,25 +42,6 @@ public class Event {
         this.timestamp = other.timestamp;
         this.type = other.type;
     }
-    
-    // Getters and setters
-    public long getId() { return id; }
-    public void setId(long id) { this.id = id; }
-    
-    public String getSymbol() { return symbol; }
-    public void setSymbol(String symbol) { this.symbol = symbol; }
-    
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
-    
-    public long getQuantity() { return quantity; }
-    public void setQuantity(long quantity) { this.quantity = quantity; }
-    
-    public long getTimestamp() { return timestamp; }
-    public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
-    
-    public EventType getType() { return type; }
-    public void setType(EventType type) { this.type = type; }
     
     @Override
     public String toString() {

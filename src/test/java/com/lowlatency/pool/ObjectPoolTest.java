@@ -34,7 +34,7 @@ class ObjectPoolTest {
     void testPoolCreation() {
         assertNotNull(stringBuilderPool);
         assertEquals(5, stringBuilderPool.size());
-        assertEquals(10, stringBuilderPool.maxSize());
+        assertEquals(10, stringBuilderPool.getMaxSize());
     }
     
     @Test
@@ -81,7 +81,7 @@ class ObjectPoolTest {
         }
         
         // Pool should not exceed max size
-        assertTrue(stringBuilderPool.size() <= stringBuilderPool.maxSize());
+        assertTrue(stringBuilderPool.size() <= stringBuilderPool.getMaxSize());
     }
     
     @Test
@@ -129,7 +129,7 @@ class ObjectPoolTest {
         
         // Pool should still be functional
         assertTrue(stringBuilderPool.size() >= 0);
-        assertTrue(stringBuilderPool.size() <= stringBuilderPool.maxSize());
+        assertTrue(stringBuilderPool.size() <= stringBuilderPool.getMaxSize());
     }
     
     // Test helper class

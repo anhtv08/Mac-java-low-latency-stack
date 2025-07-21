@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    
+    <!-- Console Appender for development -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- File Appender for production -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/low-latency-engine.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/low-latency-engine.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- Async Appender for high-performance logging -->
+    <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="FILE"/>
+        <queueSize>1024</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <includeCallerData>false</includeCallerData>
+        <neverBlock>true</neverBlock>
+    </appender>
+    
+    <!-- Logger configurations -->
+    
+    <!-- Root logger - default level -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ASYNC_FILE"/>
+    </root>
+    
+    <!-- Application specific loggers -->
+    <logger name="com.lowlatency" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ASYNC_FILE"/>
+    </logger>
+    
+    <!-- Performance critical components - reduce logging for production -->
+    <logger name="com.lowlatency.core.LowLatencyEventHandler" level="WARN" additivity="false">
+        <appender-ref ref="ASYNC_FILE"/>
+    </logger>
+    
+    <logger name="com.lowlatency.pool.ObjectPool" level="WARN" additivity="false">
+        <appender-ref ref="ASYNC_FILE"/>
+    </logger>
+    
+    <!-- Chronicle Map - reduce noise -->
+    <logger name="net.openhft" level="WARN"/>
+    
+    <!-- LMAX Disruptor - reduce noise -->
+    <logger name="com.lmax.disruptor" level="WARN"/>
+    
+    <!-- Development profile - more verbose logging -->
+    <springProfile name="dev">
+        <logger name="com.lowlatency" level="DEBUG"/>
+        <logger name="com.lowlatency.core" level="TRACE"/>
+    </springProfile>
+    
+    <!-- Production profile - minimal logging for performance -->
+    <springProfile name="prod">
+        <logger name="com.lowlatency" level="WARN"/>
+        <logger name="com.lowlatency.core.LowLatencyEventHandler" level="ERROR"/>
+        <logger name="com.lowlatency.pool.ObjectPool" level="ERROR"/>
+        <root level="WARN">
+            <appender-ref ref="ASYNC_FILE"/>
+        </root>
+    </springProfile>
+    
+</configuration>
